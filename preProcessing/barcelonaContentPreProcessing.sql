@@ -1,6 +1,6 @@
-drop table p_temp;
+drop table b_temp;
 
-create table if not exists p_temp(
+create table if not exists b_temp(
 no int,
 content string,
 mor string,
@@ -11,9 +11,9 @@ fields terminated by ','
 lines terminated by '\n'
 stored as textfile;
 
-drop table p_temp2;
+drop table b_temp2;
 
-create table if not exists p_temp2(
+create table if not exists b_temp2(
 content string,
 mor string,
 cnt int
@@ -23,25 +23,26 @@ fields terminated by ','
 lines terminated by '\n'
 stored as textfile;
 
-load data inpath 'hdfs:///user/maria_dev/projectData/parisPostResult.csv'
-into table p_temp;
+load data inpath 'hdfs:///user/maria_dev/projectData/barcelonaPostResult.csv'
+into table b_temp;
 
-insert overwrite table p_temp2
+insert overwrite table b_temp2
 select content, mor, cast(cnt as int) cnt
-from p_temp
-where mor in ( "Noun", "Modifier" );
+from b_temp
+where mor in ( "Noun", "Modifier");
 
-insert overwrite table p_temp2
+insert overwrite table b_temp2
 select content, mor, cnt
-from p_temp2
+from b_temp2
 order by cnt desc;
 
 add jar hdfs:///user/maria_dev/hive/lib/hive-contrib-3.1.2.jar;
+
 create temporary function row_sequence as 'org.apache.hadoop.hive.contrib.udf.UDFRowSequence';
 
-drop table p_wordCnt;
+drop table b_wordCnt;
 
-create table if not exists p_wordCnt(
+create table if not exists b_wordCnt(
 no int,
 content string,
 mor string,
@@ -52,8 +53,8 @@ fields terminated by ','
 lines terminated by '\n'
 stored as textfile;
 
-insert overwrite table p_wordCnt
+insert overwrite table b_wordCnt
 select row_sequence(), content, mor, cnt
-from p_temp2;
+from b_temp2;
 
-select * from p_wordcnt;
+select * from b_wordcnt;
